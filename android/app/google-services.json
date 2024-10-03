@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "138603900034",
+    "project_id": "coin-manager-a976a",
+    "storage_bucket": "coin-manager-a976a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138603900034:android:7e3f6433f7ce9cdcab589b",
+        "android_client_info": {
+          "package_name": "com.example.coin_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpkiXxeXIeiSLqyP5Oq6qss99_pR2r6eM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
