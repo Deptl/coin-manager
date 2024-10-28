@@ -18,8 +18,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(context,
-        screens: tabViewItems(), items: navBarsItems());
+    return PersistentTabView(
+      context,
+      screens: tabViewItems(),
+      items: navBarsItems(),
+      backgroundColor: primary,
+    );
   }
 }
 
@@ -27,9 +31,9 @@ List<Widget> tabViewItems() {
   return [
     DashboardScreen(),
     TransactionsScreen(),
+    AnalyticsScreen(),
     BudgetScreen(),
-    GoalScreen(),
-    AnalyticsScreen()
+    GoalScreen()
   ];
 }
 
@@ -37,28 +41,33 @@ List<PersistentBottomNavBarItem> navBarsItems() {
   return [
     PersistentBottomNavBarItem(
         icon: const Icon(FontAwesomeIcons.nfcDirectional),
-        title: "Dash", textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: primary,
-        inactiveColorPrimary: primary),
+        title: "Dash",
+        textStyle: TextStyle(fontFamily: "Poppins"),
+        activeColorPrimary: background,
+        inactiveColorPrimary: background),
     PersistentBottomNavBarItem(
         icon: const Icon(FontAwesomeIcons.file),
-        title: "Transac", textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: primary,
-        inactiveColorPrimary: primary),
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.dollarSign),
-        title: "Budget", textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: primary,
-        inactiveColorPrimary: primary),
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.bullseye),
-        title: "Goal", textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: primary,
-        inactiveColorPrimary: primary),
+        title: "Transac",
+        textStyle: TextStyle(fontFamily: "Poppins"),
+        activeColorPrimary: background,
+        inactiveColorPrimary: background),
     PersistentBottomNavBarItem(
         icon: const Icon(FontAwesomeIcons.chartBar),
-        title: "Analytics", textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: primary,
-        inactiveColorPrimary: primary),
+        title: "Analytics",
+        textStyle: TextStyle(fontFamily: "Poppins"),
+        activeColorPrimary: background,
+        inactiveColorPrimary: background),
+    PersistentBottomNavBarItem(
+        icon: const Icon(FontAwesomeIcons.dollarSign),
+        title: "Budget",
+        textStyle: TextStyle(fontFamily: "Poppins"),
+        activeColorPrimary: background,
+        inactiveColorPrimary: background),
+    PersistentBottomNavBarItem(
+        icon: const Icon(FontAwesomeIcons.bullseye),
+        title: "Goal",
+        textStyle: TextStyle(fontFamily: "Poppins"),
+        activeColorPrimary: background,
+        inactiveColorPrimary: background),
   ];
 }

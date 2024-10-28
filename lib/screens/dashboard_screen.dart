@@ -217,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     itemBuilder: (context, index) {
                       return Card(
                         elevation: 3,
-                        color: primary,
+                        color: background,
                         child: ListTile(
                           leading: ClipRRect(
                             borderRadius: BorderRadius.circular(7),
@@ -226,21 +226,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 width: 45,
                                 color: const Color.fromRGBO(250, 250, 250, 0.2),
                                 child: const Icon(FontAwesomeIcons.creditCard,
-                                    size: 30, color: background)),
+                                    size: 30, color: primary)),
                           ),
                           title: Text("Salary",
                               style: TextStyle(
-                                  fontFamily: "Poppins", color: background)),
+                                  fontFamily: "Poppins", color: primary)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("Today",
                                   style: TextStyle(
                                       fontFamily: "Poppins",
-                                      color: background)),
+                                      color: primary)),
                               Text("Apple Pay",
                                   style: TextStyle(
-                                      fontFamily: "Poppins", color: background))
+                                      fontFamily: "Poppins", color: primary))
                             ],
                           ),
                           isThreeLine: true,
@@ -249,8 +249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   fontFamily: "Poppins",
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color:
-                                      const Color.fromARGB(255, 12, 255, 21))),
+                                  color: income)),
                         ),
                       );
                     }),
