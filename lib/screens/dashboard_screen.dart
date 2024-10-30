@@ -236,8 +236,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               Text("Today",
                                   style: TextStyle(
-                                      fontFamily: "Poppins",
-                                      color: primary)),
+                                      fontFamily: "Poppins", color: primary)),
                               Text("Apple Pay",
                                   style: TextStyle(
                                       fontFamily: "Poppins", color: primary))

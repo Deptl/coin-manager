@@ -44,6 +44,7 @@ dependencies:
   syncfusion_flutter_charts: ^27.1.56
   percent_indicator: ^4.2.3
   google_mlkit_text_recognition: ^0.14.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:coin_manager/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({super.key});
@@ -10,6 +14,8 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
+
+  final TextEditingController _amountController = TextEditingController();
   bool _isIncome = true;
 
   final List<String> incomeCategory = [
@@ -41,6 +47,92 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   String? selectedCategory;
   String? selectedAccountType;
+
+  //Code for Scannoning reciept using OCR
+
+  File? _image;
+  String? _totalAmount;
+
+  final textRecognizer = TextRecognizer();
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImageFromCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _recognizeTextFromImage(_image!);
+    }
+  }
+
+  Future<void> _pickImageFormGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _recognizeTextFromImage(_image!);
+    }
+  }
+
+  Future<void> _recognizeTextFromImage(File imageFile) async {
+    final inputImage = InputImage.fromFile(imageFile);
+    final recognizedText = await textRecognizer.processImage(inputImage);
+    String totalAmount = _extractTotalAmount(recognizedText.text);
+    setState(() {
+      _totalAmount = totalAmount;
+      _amountController.text = _totalAmount ?? "";
+    });
+  }
+
+  String _extractTotalAmount(String text) {
+    // Regex pattern to match any number with two decimal places
+    final RegExp amountPattern = RegExp(r'\d+\.\d{2}');
+
+    // Split the recognized text into lines
+    List<String> lines = text.split('\n');
+
+    // Step 1: Try to find the line that contains the word "TOTAL" (case-insensitive)
+    for (int i = lines.length - 1; i >= 0; i--) {
+      String line = lines[i].trim();
+
+      // Check if the line contains the word "TOTAL" or similar variants
+      if (line.toLowerCase().contains('total')) {
+        // Find the first matching number (amount) on the same line
+        final match = amountPattern.firstMatch(line);
+        if (match != null) {
+          return match.group(0)!; // Return the total amount found
+        }
+      }
+    }
+
+    // Step 2: If no "TOTAL" is found, search the last all lines for the largest amount
+    double highestAmount = 0.0;
+
+    for (int i = lines.length - 1; i >= 0; i--) {
+      String line = lines[i].trim();
+
+      // Find all amounts in the line
+      final matches = amountPattern.allMatches(line);
+      for (var match in matches) {
+        double value = double.parse(match.group(0)!);
+        // Keep track of the highest value found
+        if (value > highestAmount) {
+          highestAmount = value;
+        }
+      }
+    }
+    return highestAmount > 0.0
+        ? highestAmount.toStringAsFixed(2)
+        : 'Total not found';
+  }
+
+  @override
+  void dispose() {
+    textRecognizer.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +208,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _amountController,
                       decoration: const InputDecoration(
                         labelText: "Amount",
                         focusedBorder: OutlineInputBorder(
@@ -154,7 +247,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       width: 55,
                       color: const Color.fromRGBO(54, 137, 131, 0.2),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: _pickImageFromCamera,
                         icon: const FaIcon(FontAwesomeIcons.camera),
                         iconSize: 30,
                         color: primary,
@@ -169,7 +262,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       width: 55,
                       color: const Color.fromRGBO(54, 137, 131, 0.2),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: _pickImageFormGallery,
                         icon: const FaIcon(FontAwesomeIcons.image),
                         iconSize: 30,
                         color: primary,
