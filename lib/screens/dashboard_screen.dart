@@ -1,3 +1,4 @@
+import 'package:coin_manager/screens/settings_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:coin_manager/utils/strings.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +46,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   color:
                                       const Color.fromRGBO(250, 250, 250, 0.2),
                                   child: IconButton(
-                                    onPressed: () {},
-                                    icon: const FaIcon(FontAwesomeIcons.user),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SettingsScreen()));
+                                    },
+                                    icon: const FaIcon(FontAwesomeIcons.gear),
                                     iconSize: 30,
                                     color: background,
                                   ),

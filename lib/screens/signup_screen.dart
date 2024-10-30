@@ -46,7 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Image.asset("assets/images/signup-image.png"),
               ),
               Container(
-                height: MediaQuery.of(context).size.height - 320,
+                height: MediaQuery.of(context).size.height - 310,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: background,

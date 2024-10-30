@@ -35,7 +35,7 @@ class _IncomeAnalyticsScreenState extends State<IncomeAnalyticsScreen> {
                     yValueMapper: (data, _) => data[0],
                     xValueMapper: (data, _) => data[1],
                     explode: true,
-                    dataLabelMapper: (data, _) => 'CAD ' + data[0].toString(),
+                    dataLabelMapper: (data, _) => '\$ ' + data[0].toString(),
                     dataLabelSettings: DataLabelSettings(
                         isVisible: true,
                         textStyle: TextStyle(fontFamily: "Poppins"),
