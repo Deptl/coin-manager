@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Image.asset("assets/images/login-image.png"),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height - 410,
+                  height: MediaQuery.of(context).size.height - 390,
                   width: double.infinity,
                   decoration: BoxDecoration(
                       color: background,

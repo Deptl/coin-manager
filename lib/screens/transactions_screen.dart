@@ -14,6 +14,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: background,
       appBar: AppBar(
         title: Text("Transactions",
             style: TextStyle(
@@ -49,7 +50,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     child: Container(
                       height: 55,
                       width: 55,
-                      color: const Color.fromRGBO(54, 137, 131, 0.2),
+                      color: Color.fromRGBO(54, 137, 131, 0.2),
                       child: IconButton(
                         onPressed: () {},
                         icon: const FaIcon(FontAwesomeIcons.chevronLeft),

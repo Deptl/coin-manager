@@ -1,3 +1,5 @@
+import 'package:coin_manager/screens/expense_category_screen.dart';
+import 'package:coin_manager/screens/income_category_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -52,50 +54,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Divider(
               color: primary,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Add Categories for Income",
-                    style: TextStyle(
-                        fontSize: 15, fontFamily: "Poppins", color: secondary)),
-                FaIcon(FontAwesomeIcons.arrowRight)
-              ],
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => IncomeCategoryScreen()));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Add Category for Income",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: "Poppins",
+                          color: secondary)),
+                  FaIcon(FontAwesomeIcons.chevronRight)
+                ],
+              ),
             ),
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Add Categories for Expense",
-                    style: TextStyle(
-                        fontSize: 15, fontFamily: "Poppins", color: secondary)),
-                FaIcon(FontAwesomeIcons.arrowRight)
-              ],
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExpenseCategoryScreen()));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Add Category for Expense",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: "Poppins",
+                          color: secondary)),
+                  FaIcon(FontAwesomeIcons.chevronRight)
+                ],
+              ),
             ),
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Add Accounts for Income",
-                    style: TextStyle(
-                        fontSize: 15, fontFamily: "Poppins", color: secondary)),
-                FaIcon(FontAwesomeIcons.arrowRight)
-              ],
+            InkWell(
+              onTap: () {},
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Add Accounts for Income",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: "Poppins",
+                          color: secondary)),
+                  FaIcon(FontAwesomeIcons.chevronRight)
+                ],
+              ),
             ),
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Add Accounts for Expense",
-                    style: TextStyle(
-                        fontSize: 15, fontFamily: "Poppins", color: secondary)),
-                FaIcon(FontAwesomeIcons.arrowRight)
-              ],
+            InkWell(
+              onTap: () {},
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Add Accounts for Expense",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: "Poppins",
+                          color: secondary)),
+                  FaIcon(FontAwesomeIcons.chevronRight)
+                ],
+              ),
             ),
             SizedBox(
               height: 20,

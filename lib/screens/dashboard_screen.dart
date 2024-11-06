@@ -37,7 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             Positioned(
                               top: 25,
-                              left: 350,
+                              left: 335,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Container(
