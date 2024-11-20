@@ -1,6 +1,8 @@
 import 'package:coin_manager/screens/expense_category_screen.dart';
 import 'package:coin_manager/screens/income_category_screen.dart';
+import 'package:coin_manager/screens/login_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -159,9 +161,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
             SizedBox(height: 10),
-            Text("Logout",
-                style: TextStyle(
-                    fontSize: 15, fontFamily: "Poppins", color: secondary)),
+            InkWell(
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Text("Logout",
+                  style: TextStyle(
+                      fontSize: 15, fontFamily: "Poppins", color: secondary)),
+            ),
           ],
         ),
       ),

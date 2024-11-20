@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:coin_manager/controllers/transaction_controller.dart';
 import 'package:coin_manager/utils/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
@@ -14,7 +16,8 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-
+  final TransactionController _transactionController = TransactionController();
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
   bool _isIncome = true;
 
@@ -134,6 +137,27 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.dispose();
   }
 
+  void _addTransaction() {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No user is logged in.")),
+      );
+      return;
+    }
+    _transactionController.addTransaction(
+        userId: currentUserId,
+        type: _isIncome ? "Income" : "Expense",
+        amount: double.tryParse(_amountController.text) ?? 0.0,
+        category: selectedCategory ?? "",
+        account: selectedAccountType ?? "",
+        createdAt: DateTime.now());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Transaction added successfully')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,59 +173,62 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         fontFamily: "Poppins", color: secondary, fontSize: 22)),
               ),
               SizedBox(height: 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _isIncome = true;
-                            selectedCategory = null;
-                            selectedAccountType = null;
-                          });
-                        },
-                        child: Text("Income",
-                            style: TextStyle(
-                                fontFamily: "Poppins", color: secondary)),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: _isIncome ? Colors.green : primary,
-                            width: 2,
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        )),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _isIncome = false;
-                            selectedCategory = null;
-                            selectedAccountType = null;
-                          });
-                        },
-                        child: Text("Expense",
-                            style: TextStyle(
-                                fontFamily: "Poppins", color: secondary)),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: !_isIncome ? Colors.red : primary,
-                            width: 2,
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        )),
-                  ),
-                ],
+              Form(
+                key: _formKey,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              _isIncome = true;
+                              selectedCategory = null;
+                              selectedAccountType = null;
+                            });
+                          },
+                          child: Text("Income",
+                              style: TextStyle(
+                                  fontFamily: "Poppins", color: secondary)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: _isIncome ? Colors.green : primary,
+                              width: 2,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          )),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              _isIncome = false;
+                              selectedCategory = null;
+                              selectedAccountType = null;
+                            });
+                          },
+                          child: Text("Expense",
+                              style: TextStyle(
+                                  fontFamily: "Poppins", color: secondary)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: !_isIncome ? Colors.red : primary,
+                              width: 2,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          )),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 20),
               Row(
@@ -360,12 +387,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                   onPressed: () async {
-                    // if (_formKey.currentState!.validate()) {}
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => HomeScreen()),
-                    // );
-                    Navigator.pop(context);
+                    if (_formKey.currentState!.validate()) {
+                      _addTransaction();
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: primary),
                   child: Text("Add Transaction",

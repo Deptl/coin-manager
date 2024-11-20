@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,6 +11,8 @@ class IncomeCategoryScreen extends StatefulWidget {
 }
 
 class _IncomeCategoryScreenState extends State<IncomeCategoryScreen> {
+  final CollectionReference _incomeCategoryCollection =
+      FirebaseFirestore.instance.collection('Category');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,24 +89,46 @@ class _IncomeCategoryScreenState extends State<IncomeCategoryScreen> {
         backgroundColor: primary,
       ),
       backgroundColor: background,
-      body: ListView.builder(
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              child: ListTile(
-                leading: Text("Salary",
-                    style: TextStyle(
-                        fontFamily: "Poppins", color: primary, fontSize: 15)),
-                trailing: IconButton(
-                    onPressed: () {},
-                    icon: FaIcon(
-                      FontAwesomeIcons.trashCan,
-                      color: Colors.red,
-                    )),
-              ),
-            );
-          }),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _incomeCategoryCollection
+            .where('type', isEqualTo: 'income')
+            .snapshots(),
+        builder: (context, snapshot) {
+           if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No income transactions available'));
+          }
+          final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+          return ListView.builder(
+              itemCount: documents.length,
+              itemBuilder: (context, index) {
+                final data = documents[index].data() as Map<String, dynamic>;
+                return Card(
+                  elevation: 5,
+                  child: ListTile(
+                    leading: Text(data["name"] ?? "",
+                        style: TextStyle(
+                            fontFamily: "Poppins",
+                            color: primary,
+                            fontSize: 15)),
+                    trailing: IconButton(
+                        onPressed: () {},
+                        icon: FaIcon(
+                          FontAwesomeIcons.trashCan,
+                          color: Colors.red,
+                        )),
+                  ),
+                );
+              });
+        },
+      ),
     );
   }
 }

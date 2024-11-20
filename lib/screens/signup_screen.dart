@@ -1,3 +1,5 @@
+import 'package:coin_manager/controllers/auth_controller.dart';
+import 'package:coin_manager/models/user_model.dart';
 import 'package:coin_manager/screens/home_screen.dart';
 import 'package:coin_manager/screens/login_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
@@ -13,6 +15,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final AuthController _authController = AuthController();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameTextEditingController =
       TextEditingController();
@@ -22,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
       TextEditingController();
   final TextEditingController _passwordTextEditingController =
       TextEditingController();
+  bool isObscured = true;
 
   final String emailPattern = r'^[^@]+@[^@]+\.[^@]+$';
   bool _validateEmail(String email) {
@@ -29,7 +33,32 @@ class _SignupScreenState extends State<SignupScreen> {
     return expression.hasMatch(email);
   }
 
-  bool isObscured = true;
+  _signUp() async {
+    try {
+      final user = UserModel(
+          userId: "",
+          firstName: _firstNameTextEditingController.text.toString(),
+          lastName: _lastNameTextEditingController.text.toString(),
+          email: _emailTextEditingController.text.toString(),
+          hashPassword: "",
+          createdAt: DateTime.now());
+
+      await _authController.createUser(
+          user, _passwordTextEditingController.text.trim());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Signup successful!')),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +75,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Image.asset("assets/images/signup-image.png"),
               ),
               Container(
-                height: MediaQuery.of(context).size.height - 310,
+                height: MediaQuery.of(context).size.height - 295,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: background,
@@ -73,7 +102,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               color: secondary,
                               fontWeight: FontWeight.bold,
                               fontSize: 15)),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       Form(
                         key: _formKey,
                         child: Column(
@@ -285,16 +314,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 return null;
                               },
                             ),
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 15),
                             ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            HomeScreen()),
-                                  );
-                                },
+                                onPressed: _signUp,
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: primary),
                                 child: Text("Sign Up",
@@ -302,9 +324,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                         fontFamily: "Poppins",
                                         fontWeight: FontWeight.bold,
                                         color: background))),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 3),
                             const Divider(color: secondary),
-                            const SizedBox(height: 5),
+                            const SizedBox(height: 3),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,

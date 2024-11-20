@@ -1,3 +1,5 @@
+import 'package:coin_manager/controllers/auth_controller.dart';
+import 'package:coin_manager/models/user_model.dart';
 import 'package:coin_manager/screens/home_screen.dart';
 import 'package:coin_manager/screens/signup_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
@@ -188,12 +190,45 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(height: 30),
                               ElevatedButton(
                                   onPressed: () async {
-                                    // if (_formKey.currentState!.validate()) {}
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => HomeScreen()),
-                                    );
+                                    if (_formKey.currentState!.validate()) {
+                                      final email = _emailTextEditingController
+                                          .text
+                                          .trim();
+                                      final password =
+                                          _passwordTextEditingController.text
+                                              .trim();
+                                      try {
+                                        UserModel? user = await AuthController()
+                                            .loginUser(email, password);
+
+                                        if (user != null) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomeScreen()),
+                                          );
+                                        } else {
+                                          final loginSnackbar = SnackBar(
+                                            content: Text(
+                                                "Invalid email or password",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    color: secondary)),
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(loginSnackbar);
+                                        }
+                                      } catch (e) {
+                                        final errorSnackbar = SnackBar(
+                                            content: Text("Login failed: $e",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    color: secondary)));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(errorSnackbar);
+                                      }
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: primary),
@@ -216,10 +251,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   TextButton(
                                       onPressed: () {
                                         Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => SignupScreen()),
-                                    );
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SignupScreen()),
+                                        );
                                       },
                                       child: Text("Sign Up",
                                           style: TextStyle(
