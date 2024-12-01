@@ -10,7 +10,7 @@ class TransactionModel {
 
   Map<String, dynamic> toJson(){
     return{
-      "transactionId"
+      "transactionId": transactionId,
       "type": type,
       "amount": amount,
       "category": category,

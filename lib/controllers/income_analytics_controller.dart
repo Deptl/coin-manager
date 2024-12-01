@@ -10,7 +10,7 @@ class IncomeAnalyticsController {
     .collection('Users')
         .doc(userId)
         .collection('Transaction')
-        .where('transactionIdtype', isEqualTo: "Income")
+        .where('type', isEqualTo: "Income")
         .snapshots()
         .map((querySnapshot) {
           Map<String, double> tempData = {};

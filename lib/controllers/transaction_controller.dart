@@ -38,7 +38,8 @@ class TransactionController {
     required int year,
   }) {
     DateTime startDate = DateTime(year, month, 1);
-    DateTime endDate = DateTime(year, month + 1, 0);
+    DateTime endDate =
+        DateTime(year, month + 1, 1).subtract(Duration(seconds: 1)).toUtc();
 
     return _firebaseFirestore
         .collection('Users')
@@ -50,7 +51,11 @@ class TransactionController {
         .snapshots()
         .map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
-        return doc.data();
+        final data = doc.data();
+        if (data['createdAt'] != null) {
+          data['createdAt'] = DateTime.parse(data['createdAt']).toLocal();
+        }
+        return data;
       }).toList();
     });
   }

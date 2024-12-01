@@ -5,6 +5,7 @@ import 'package:coin_manager/screens/login_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:coin_manager/utils/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -26,6 +27,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordTextEditingController =
       TextEditingController();
   bool isObscured = true;
+  bool isLoading = false;
 
   final String emailPattern = r'^[^@]+@[^@]+\.[^@]+$';
   bool _validateEmail(String email) {
@@ -34,6 +36,10 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      isLoading = true;
+    });
     try {
       final user = UserModel(
           userId: "",
@@ -57,6 +63,10 @@ class _SignupScreenState extends State<SignupScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -315,15 +325,20 @@ class _SignupScreenState extends State<SignupScreen> {
                               },
                             ),
                             const SizedBox(height: 15),
-                            ElevatedButton(
-                                onPressed: _signUp,
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: primary),
-                                child: Text("Sign Up",
-                                    style: TextStyle(
-                                        fontFamily: "Poppins",
-                                        fontWeight: FontWeight.bold,
-                                        color: background))),
+                            isLoading
+                                ? SpinKitThreeBounce(
+                                    color: primary,
+                                    size: 40.0,
+                                  )
+                                : ElevatedButton(
+                                    onPressed: _signUp,
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: primary),
+                                    child: Text("Sign Up",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontWeight: FontWeight.bold,
+                                            color: background))),
                             const SizedBox(height: 3),
                             const Divider(color: secondary),
                             const SizedBox(height: 3),

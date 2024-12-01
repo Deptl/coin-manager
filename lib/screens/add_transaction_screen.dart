@@ -4,6 +4,7 @@ import 'package:coin_manager/controllers/transaction_controller.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +21,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
   bool _isIncome = true;
+  bool _isLoading = false;
+  String? selectedCategory;
+  String? selectedAccountType;
 
   final List<String> incomeCategory = [
     "Salary",
@@ -48,9 +52,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     "Creadit Card"
   ];
 
-  String? selectedCategory;
-  String? selectedAccountType;
-
   //Code for Scannoning reciept using OCR
 
   File? _image;
@@ -62,9 +63,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Future<void> _pickImageFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      if (mounted) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+      }
       _recognizeTextFromImage(_image!);
     }
   }
@@ -72,9 +75,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Future<void> _pickImageFormGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+      if (mounted) {
+        setState(() {
+          _image = File(pickedFile.path);
+        });
+      }
       _recognizeTextFromImage(_image!);
     }
   }
@@ -83,10 +88,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     final inputImage = InputImage.fromFile(imageFile);
     final recognizedText = await textRecognizer.processImage(inputImage);
     String totalAmount = _extractTotalAmount(recognizedText.text);
-    setState(() {
-      _totalAmount = totalAmount;
-      _amountController.text = _totalAmount ?? "";
-    });
+    if (mounted) {
+      setState(() {
+        _totalAmount = totalAmount;
+        _amountController.text = _totalAmount ?? "";
+      });
+    }
   }
 
   String _extractTotalAmount(String text) {
@@ -137,25 +144,65 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.dispose();
   }
 
-  void _addTransaction() {
+  void _addTransaction() async {
+    if (!mounted)
+      return; // Check if the widget is still mounted before calling setState
+    setState(() {
+      _isLoading = true;
+    });
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No user is logged in.")),
       );
+      if (mounted) {
+        // Check if the widget is still mounted before calling setState
+        setState(() {
+          _isLoading = false;
+        });
+      }
       return;
     }
-    _transactionController.addTransaction(
-        userId: currentUserId,
-        type: _isIncome ? "Income" : "Expense",
-        amount: double.tryParse(_amountController.text) ?? 0.0,
-        category: selectedCategory ?? "",
-        account: selectedAccountType ?? "",
-        createdAt: DateTime.now());
+    if (selectedCategory == null || selectedAccountType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please select Category and Account")));
+      if (mounted) {
+        // Check if the widget is still mounted before calling setState
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+    try {
+      await _transactionController.addTransaction(
+          userId: currentUserId,
+          type: _isIncome ? "Income" : "Expense",
+          amount: double.tryParse(_amountController.text) ?? 0.0,
+          category: selectedCategory ?? "",
+          account: selectedAccountType ?? "",
+          createdAt: DateTime.now());
+      if (mounted) {
+        // Check if the widget is still mounted before calling setState
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Transaction added successfully')),
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Transaction added successfully')),
-    );
+      Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
 
   @override
@@ -181,11 +228,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     Expanded(
                       child: OutlinedButton(
                           onPressed: () {
-                            setState(() {
-                              _isIncome = true;
-                              selectedCategory = null;
-                              selectedAccountType = null;
-                            });
+                            if (mounted) {
+                              // Check if the widget is still mounted before calling setState
+                              setState(() {
+                                _isIncome = true;
+                                selectedCategory = null;
+                                selectedAccountType = null;
+                              });
+                            }
                           },
                           child: Text("Income",
                               style: TextStyle(
@@ -206,11 +256,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     Expanded(
                       child: OutlinedButton(
                           onPressed: () {
-                            setState(() {
-                              _isIncome = false;
-                              selectedCategory = null;
-                              selectedAccountType = null;
-                            });
+                            if (mounted) {
+                              // Check if the widget is still mounted before calling setState
+                              setState(() {
+                                _isIncome = false;
+                                selectedCategory = null;
+                                selectedAccountType = null;
+                              });
+                            }
                           },
                           child: Text("Expense",
                               style: TextStyle(
@@ -236,6 +289,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: _amountController,
+                      keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         labelText: "Amount",
                         focusedBorder: OutlineInputBorder(
@@ -385,21 +439,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 },
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _addTransaction();
-                      Navigator.pop(context);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error')),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: primary),
-                  child: Text("Add Transaction",
-                      style:
-                          TextStyle(fontFamily: "Poppins", color: background)))
+              _isLoading
+                  ? SpinKitThreeBounce(
+                      color: primary,
+                      size: 40.0,
+                    )
+                  : ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          _addTransaction();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: primary),
+                      child: Text("Add Transaction",
+                          style: TextStyle(
+                              fontFamily: "Poppins", color: background)))
             ],
           ),
         ),

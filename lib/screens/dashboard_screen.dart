@@ -59,7 +59,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       List<Map<String, dynamic>> transactions = querySnapshot.docs.map((doc) {
         final data = doc.data();
         final double amount = (data['amount'] as num).toDouble();
-        final String transactionType = data['transactionIdtype'] ?? '';
+        final String transactionType = data['type'] ?? '';
 
         if (transactionType == 'Income') {
           totalIncome += amount;
@@ -96,12 +96,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   String formatDate(String isoString) {
-    // Parse the ISO 8601 string to a DateTime object
-    DateTime dateTime = DateTime.parse(isoString);
+  // Parse the ISO string to a DateTime object
+  DateTime utcDateTime = DateTime.parse(isoString);
 
-    // Format the DateTime to the desired format
-    return DateFormat('MMMM d, yyyy').format(dateTime);
-  }
+  // Convert to local time
+  DateTime localDateTime = utcDateTime.toLocal();
+
+  // Format the DateTime to the desired format
+  return DateFormat('MMMM d, yyyy').format(localDateTime);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -396,7 +400,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       fontFamily: "Poppins",
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
-                                      color: transaction["transactionIdtype"] ==
+                                      color: transaction["type"] ==
                                               "Income"
                                           ? incomeColor
                                           : expenseColor)),

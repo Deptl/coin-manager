@@ -6,7 +6,6 @@ import 'package:coin_manager/screens/transactions_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,58 +15,56 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return PersistentTabView(
-      context,
-      screens: tabViewItems(),
-      items: navBarsItems(),
-      backgroundColor: primary,
-    );
-  }
-}
+  int _currentIndex = 0;
 
-List<Widget> tabViewItems() {
-  return [
+  final List<Widget> _tabItems = [
     DashboardScreen(),
     TransactionsScreen(),
     AnalyticsScreen(),
     BudgetScreen(),
     GoalScreen()
   ];
-}
-
-List<PersistentBottomNavBarItem> navBarsItems() {
-  return [
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.nfcDirectional),
-        title: "Dash",
-        textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: background,
-        inactiveColorPrimary: background),
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.file),
-        title: "Transac",
-        textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: background,
-        inactiveColorPrimary: background),
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.chartBar),
-        title: "Analytics",
-        textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: background,
-        inactiveColorPrimary: background),
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.dollarSign),
-        title: "Budget",
-        textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: background,
-        inactiveColorPrimary: background),
-    PersistentBottomNavBarItem(
-        icon: const Icon(FontAwesomeIcons.bullseye),
-        title: "Goal",
-        textStyle: TextStyle(fontFamily: "Poppins"),
-        activeColorPrimary: background,
-        inactiveColorPrimary: background),
-  ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _tabItems[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: primary,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        selectedItemColor: background,
+        unselectedItemColor: background,
+        selectedLabelStyle:
+            TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold, fontSize: 12),
+        unselectedLabelStyle: TextStyle(fontFamily: "Poppins", fontSize: 10),
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(FontAwesomeIcons.nfcDirectional, color: background),
+              label: "Dashboard",
+              backgroundColor: background),
+          BottomNavigationBarItem(
+              icon: Icon(FontAwesomeIcons.file, color: background),
+              label: "Transac.",
+              backgroundColor: background),
+          BottomNavigationBarItem(
+              icon: Icon(FontAwesomeIcons.chartBar, color: background),
+              label: "Analytics",
+              backgroundColor: background),
+          BottomNavigationBarItem(
+              icon: Icon(FontAwesomeIcons.dollarSign, color: background),
+              label: "Budget",
+              backgroundColor: background),
+          BottomNavigationBarItem(
+              icon: Icon(FontAwesomeIcons.bullseye, color: background),
+              label: "Goal",
+              backgroundColor: background)
+        ],
+      ),
+    );
+  }
 }

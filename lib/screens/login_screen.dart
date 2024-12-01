@@ -5,6 +5,7 @@ import 'package:coin_manager/screens/signup_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:coin_manager/utils/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool isObscured = true;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -188,55 +190,71 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                               ),
                               const SizedBox(height: 30),
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      final email = _emailTextEditingController
-                                          .text
-                                          .trim();
-                                      final password =
-                                          _passwordTextEditingController.text
-                                              .trim();
-                                      try {
-                                        UserModel? user = await AuthController()
-                                            .loginUser(email, password);
+                              isLoading
+                                  ? SpinKitThreeBounce(
+                                      color: primary,
+                                      size: 40.0,
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: () async {
+                                        if (_formKey.currentState!.validate()) {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
+                                          final email =
+                                              _emailTextEditingController.text
+                                                  .trim();
+                                          final password =
+                                              _passwordTextEditingController
+                                                  .text
+                                                  .trim();
+                                          try {
+                                            UserModel? user =
+                                                await AuthController()
+                                                    .loginUser(email, password);
 
-                                        if (user != null) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    HomeScreen()),
-                                          );
-                                        } else {
-                                          final loginSnackbar = SnackBar(
-                                            content: Text(
-                                                "Invalid email or password",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    color: secondary)),
-                                          );
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(loginSnackbar);
+                                            if (user != null) {
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HomeScreen(),
+                                                  ),
+                                                  (route) => false);
+                                            } else {
+                                              final loginSnackbar = SnackBar(
+                                                content: Text(
+                                                    "Invalid email or password",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        color: secondary)),
+                                              );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(loginSnackbar);
+                                            }
+                                          } catch (e) {
+                                            final errorSnackbar = SnackBar(
+                                                content: Text(
+                                                    "Login failed: $e",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        color: secondary)));
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(errorSnackbar);
+                                          } finally {
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          }
                                         }
-                                      } catch (e) {
-                                        final errorSnackbar = SnackBar(
-                                            content: Text("Login failed: $e",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    color: secondary)));
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(errorSnackbar);
-                                      }
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: primary),
-                                  child: Text("Log In",
-                                      style: TextStyle(
-                                          fontFamily: "Poppins",
-                                          fontWeight: FontWeight.bold,
-                                          color: background))),
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: primary),
+                                      child: Text("Log In",
+                                          style: TextStyle(
+                                              fontFamily: "Poppins",
+                                              fontWeight: FontWeight.bold,
+                                              color: background))),
                               const SizedBox(height: 10),
                               const Divider(color: secondary),
                               const SizedBox(height: 5),

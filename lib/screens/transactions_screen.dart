@@ -36,31 +36,30 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   ];
 
   void changeMonth(bool isNext) {
-    setState(() {
-      if (isNext) {
-        if (month == 12) {
-          month = 1;
-          year++;
+    if (mounted) {
+      setState(() {
+        if (isNext) {
+          if (month == 12) {
+            month = 1;
+            year++;
+          } else {
+            month++;
+          }
         } else {
-          month++;
+          if (month == 1) {
+            month = 12;
+            year--;
+          } else {
+            month--;
+          }
         }
-      } else {
-        if (month == 1) {
-          month = 12;
-          year--;
-        } else {
-          month--;
-        }
-      }
-    });
+      });
+    }
   }
 
- String formatDate(String isoString) {
-    DateTime dateTime = DateTime.parse(isoString);
+  String formatDate(DateTime dateTime) {
     return DateFormat('MMMM d, yyyy').format(dateTime);
   }
-    
-    
 
   @override
   Widget build(BuildContext context) {
@@ -197,19 +196,22 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                       style: TextStyle(
                                           fontFamily: "Poppins",
                                           color: primary)),
-                                  Text(formatDate(transaction["createdAt"] ?? ""),
+                                  Text(formatDate(transaction["createdAt"]),
                                       style: TextStyle(
                                           fontFamily: "Poppins",
                                           color: primary))
                                 ],
                               ),
                               isThreeLine: true,
-                              trailing: Text( "\$" + transaction["amount"].toString(),
+                              trailing: Text(
+                                  "\$" + transaction["amount"].toString(),
                                   style: TextStyle(
                                       fontFamily: "Poppins",
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
-                                      color: transaction["transactionIdtype"] == "Income" ? incomeColor : expenseColor)),
+                                      color: transaction["type"] == "Income"
+                                          ? incomeColor
+                                          : expenseColor)),
                             ),
                           ),
                         );

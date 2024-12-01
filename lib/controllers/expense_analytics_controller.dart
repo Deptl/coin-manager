@@ -10,7 +10,7 @@ class ExpenseAnalyticsController {
         .collection('Users')
         .doc(userId)
         .collection('Transaction')
-        .where('transactionIdtype', isEqualTo: "Expense")
+        .where('type', isEqualTo: "Expense")
         .snapshots()
         .map((querySnapshot) {
       Map<String, double> tempData = {};

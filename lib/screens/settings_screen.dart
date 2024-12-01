@@ -15,6 +15,48 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isToggled = false;
+
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Are you sure you want to Logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    ).then((result) async {
+      if (result == true) {
+        await FirebaseAuth.instance.signOut();
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginScreen(),
+            ),
+            (route) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Action canceled.')),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,11 +82,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Divider(
               color: primary,
             ),
-            Text("John Doe",
+            Text("Deep Patel",
                 style: TextStyle(
                     fontSize: 15, fontFamily: "Poppins", color: secondary)),
             SizedBox(height: 5),
-            Text("jdoe2334@gmail.com",
+            Text("dpatel312@gmail.com",
                 style: TextStyle(
                     fontSize: 15, fontFamily: "Poppins", color: secondary)),
             SizedBox(height: 20),
@@ -98,40 +140,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             SizedBox(
-              height: 10,
-            ),
-            InkWell(
-              onTap: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Add Accounts for Income",
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: "Poppins",
-                          color: secondary)),
-                  FaIcon(FontAwesomeIcons.chevronRight)
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            InkWell(
-              onTap: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Add Accounts for Expense",
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontFamily: "Poppins",
-                          color: secondary)),
-                  FaIcon(FontAwesomeIcons.chevronRight)
-                ],
-              ),
-            ),
-            SizedBox(
               height: 20,
             ),
             Center(
@@ -162,12 +170,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SizedBox(height: 10),
             InkWell(
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
+              onTap: () {
+                _showConfirmationDialog(context);
               },
               child: Text("Logout",
                   style: TextStyle(
