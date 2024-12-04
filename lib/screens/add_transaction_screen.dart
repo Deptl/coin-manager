@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:coin_manager/controllers/transaction_controller.dart';
 import 'package:coin_manager/utils/colors.dart';
+import 'package:coin_manager/utils/toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -39,6 +40,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     "Transport",
     "Health",
     "Education",
+    "Rent",
+    "Bills",
+    "Utilities"
     "Other"
   ];
 
@@ -49,7 +53,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     "Cash",
     "Apple Pay",
     "Google Pay",
-    "Creadit Card"
+    "Credit Card"
   ];
 
   //Code for Scannoning reciept using OCR
@@ -152,9 +156,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     if (currentUserId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No user is logged in.")),
-      );
+      Toast.showToast("No user is LoggedIn");
       if (mounted) {
         // Check if the widget is still mounted before calling setState
         setState(() {
@@ -164,8 +166,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
     if (selectedCategory == null || selectedAccountType == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please select Category and Account")));
+      Toast.showToast("Plaese select category and account");
       if (mounted) {
         // Check if the widget is still mounted before calling setState
         setState(() {
@@ -188,9 +189,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           _isLoading = false;
         });
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Transaction added successfully')),
-      );
+      Toast.showToast("Transaction Added Successfully");
 
       Navigator.pop(context);
     } catch (e) {
@@ -199,9 +198,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           _isLoading = false;
         });
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      print(e);
     }
   }
 
@@ -308,13 +305,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       style: TextStyle(fontFamily: "Poppins", color: secondary),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          final amountSnackbar = SnackBar(
-                              content: Text("Please Enter Amount",
-                                  style: TextStyle(
-                                      fontFamily: "Poppins",
-                                      color: secondary)));
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(amountSnackbar);
+                          Toast.showToast("Please enter amount");
                         }
                         return null;
                       },
@@ -387,10 +378,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 isExpanded: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please select a Category",
-                            style: TextStyle(
-                                fontFamily: "Poppins", color: secondary))));
+                    Toast.showToast("Plaese select a category");
                   }
                   return null;
                 },
@@ -430,10 +418,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 isExpanded: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please select an account",
-                            style: TextStyle(
-                                fontFamily: "Poppins", color: secondary))));
+                    Toast.showToast("Please select an account");
                   }
                   return null;
                 },
@@ -449,9 +434,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         if (_formKey.currentState!.validate()) {
                           _addTransaction();
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error')),
-                          );
+                          Toast.showToast("Error Adding Transaction");
                         }
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: primary),

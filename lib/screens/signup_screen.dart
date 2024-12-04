@@ -4,6 +4,7 @@ import 'package:coin_manager/screens/home_screen.dart';
 import 'package:coin_manager/screens/login_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:coin_manager/utils/strings.dart';
+import 'package:coin_manager/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -51,18 +52,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
       await _authController.createUser(
           user, _passwordTextEditingController.text.trim());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signup successful!')),
-      );
+      Toast.showToast("Signup Successful");
 
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      print(e);
     } finally {
       setState(() {
         isLoading = false;
@@ -85,7 +82,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Image.asset("assets/images/signup-image.png"),
               ),
               Container(
-                height: MediaQuery.of(context).size.height - 295,
+                height: MediaQuery.of(context).size.height - 245,
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: background,
@@ -145,22 +142,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               controller: _firstNameTextEditingController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  final fnSnackbar1 = SnackBar(
-                                      content: Text("Please enter First Name",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(fnSnackbar1);
+                                  Toast.showToast("Please enter first name");
                                 } else if (value.length < 2) {
-                                  final fnSnackbar2 = SnackBar(
-                                      content: Text(
-                                          "First name Should be more than 2 characters",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(fnSnackbar2);
+                                  Toast.showToast("First name should be more than 2 characters");
                                 }
                                 return null;
                               },
@@ -194,22 +178,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               controller: _lastNameTextEditingController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  final lnSnackbar1 = SnackBar(
-                                      content: Text("Please enter Last Name",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(lnSnackbar1);
+                                  Toast.showToast("Please enter last name");
                                 } else if (value.length < 2) {
-                                  final lnSnackbar2 = SnackBar(
-                                      content: Text(
-                                          "Last Name should be more than 2 characters",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(lnSnackbar2);
+                                  Toast.showToast("Last Name should be more than 2 characters");
                                 }
                                 return null;
                               },
@@ -243,21 +214,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               controller: _emailTextEditingController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  final emailSnackbar1 = SnackBar(
-                                      content: Text("Please enter your email",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(emailSnackbar1);
+                                  Toast.showToast("Please enter your email");
                                 } else if (!_validateEmail(value)) {
-                                  final emailSnackbar1 = SnackBar(
-                                      content: Text("Please enter valid email",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(emailSnackbar1);
+                                  Toast.showToast("Please enter valid email");
                                 }
                                 return null;
                               },
@@ -304,22 +263,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               controller: _passwordTextEditingController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  final passSnackbar1 = SnackBar(
-                                      content: Text("Please enter password",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(passSnackbar1);
-                                } else if (value.length < 8) {
-                                  final passSnackbar2 = SnackBar(
-                                      content: Text(
-                                          "Please enter more than 8 characters",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(passSnackbar2);
+                                  Toast.showToast("Please enter password");
+                                } else if (value.length < 6) {
+                                  Toast.showToast("Please enter more than 6 characters");
                                 }
                                 return null;
                               },

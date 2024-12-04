@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coin_manager/utils/colors.dart';
+import 'package:coin_manager/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -56,13 +57,7 @@ class _ExpenseCategoryScreenState extends State<ExpenseCategoryScreen> {
                                   fontFamily: "Poppins", color: secondary),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  final amountSnackbar = SnackBar(
-                                      content: Text("Please Enter Amount",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              color: secondary)));
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(amountSnackbar);
+                                  Toast.showToast("Plaese enter name");
                                 }
                                 return null;
                               },

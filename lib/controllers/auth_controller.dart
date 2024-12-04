@@ -58,4 +58,23 @@ class AuthController {
       throw Exception('Failed to login: $e');
     }
   }
+
+  Future<UserModel?> getUserDetails() async {
+  try {
+    final String userId = _auth.currentUser?.uid ?? '';
+    if (userId.isEmpty) throw Exception("No logged-in user found");
+
+    final DocumentSnapshot userSnapshot =
+        await _firestore.collection('Users').doc(userId).get();
+
+    if (userSnapshot.exists) {
+      return UserModel.fromJson(userSnapshot.data() as Map<String, dynamic>);
+    } else {
+      throw Exception('User not found in Firestore');
+    }
+  } catch (e) {
+    throw Exception('Failed to fetch user details: $e');
+  }
+}
+
 }

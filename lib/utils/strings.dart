@@ -1,5 +1,5 @@
 class Strings {
-  static const String greetings = "Good Morning";
+  static const String greetings = "Welcome";
   static const String name = "John Doe";
   static const String welcomeMessage = "Welcome Back!!";
   static const String loginMessage = "Please Log In to your account";

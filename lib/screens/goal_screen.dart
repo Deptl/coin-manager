@@ -1,6 +1,8 @@
 import 'package:coin_manager/controllers/goal_controller.dart';
+import 'package:coin_manager/models/goal_data_model.dart';
 import 'package:coin_manager/models/goal_model.dart';
 import 'package:coin_manager/utils/colors.dart';
+import 'package:coin_manager/utils/toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,24 +20,66 @@ class _GoalScreenState extends State<GoalScreen> {
   final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
   GoalModel? currentGoal;
   double totalSaved = 0;
+  final TextEditingController goalAmountController = TextEditingController();
+  final TextEditingController goalNoteController = TextEditingController();
+
+   @override
+  void initState() {
+    super.initState();
+    _fetchGoal(); 
+  }
 
   Future<void> _fetchGoal() async {
     final goalStream = _goalController.getGoalsStream(userId: currentUserId);
 
-    goalStream.first.then((goalList) {
+    goalStream.first.then((goalList) async {
       if (goalList.isNotEmpty) {
-        setState(() {
-          currentGoal = goalList.first;
-        });
+        if (mounted) {
+          setState(() { // <-- CHANGED: Check mounted
+            currentGoal = goalList.first;
+          });
+        }
       } else {
-        setState(() {
-          currentGoal = null;
-        });
+        if (mounted) {
+          setState(() { // <-- CHANGED: Check mounted
+            currentGoal = null;
+          });
+        }
       }
+      await _calculateTotalSaved();
     }).catchError((error) {
       debugPrint("Error fetching goals: $error");
     });
   }
+
+  Future<void> _calculateTotalSaved() async {
+  try {
+    final goalDataStream = _goalController.getGoalDataStream(userId: currentUserId);
+
+    double savedAmount = 0;
+
+    // Process each item in the stream
+    await for (var goalDataList in goalDataStream) {
+      for (var goalData in goalDataList) {
+        final parsedAmount = double.tryParse(goalData.amount.toString());
+        if (parsedAmount != null) {
+          savedAmount += parsedAmount;
+        } else {
+          debugPrint("Failed to parse amount: ${goalData.amount}");
+        }
+      }
+      // Update totalSaved after processing each batch
+      if (mounted) {
+        setState(() {
+          totalSaved = savedAmount;
+        });
+      }
+    }
+    debugPrint("Total saved successfully updated: $totalSaved");
+  } catch (e) {
+    debugPrint("Error in _calculateTotalSaved: $e");
+  }
+}
 
   Future<void> _showAddGoalDialog() async {
     final TextEditingController amountController = TextEditingController();
@@ -117,6 +161,8 @@ class _GoalScreenState extends State<GoalScreen> {
                                     child: Column(
                                   children: [
                                     TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      controller: goalAmountController,
                                       decoration: const InputDecoration(
                                         labelText: "Amount",
                                         focusedBorder: OutlineInputBorder(
@@ -137,20 +183,14 @@ class _GoalScreenState extends State<GoalScreen> {
                                           color: secondary),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          final amountSnackbar = SnackBar(
-                                              content: Text(
-                                                  "Please Enter Amount",
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      color: secondary)));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(amountSnackbar);
+                                          Toast.showToast("Please enter amount");
                                         }
                                         return null;
                                       },
                                     ),
                                     SizedBox(height: 20),
                                     TextFormField(
+                                      controller: goalNoteController,
                                       decoration: const InputDecoration(
                                         labelText: "Note",
                                         focusedBorder: OutlineInputBorder(
@@ -171,21 +211,38 @@ class _GoalScreenState extends State<GoalScreen> {
                                           color: secondary),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          final amountSnackbar = SnackBar(
-                                              content: Text(
-                                                  "Please Enter Amount",
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      color: secondary)));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(amountSnackbar);
+                                          Toast.showToast("Please enter note");
                                         }
                                         return null;
                                       },
                                     ),
                                     SizedBox(height: 20),
                                     ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () async {
+                                          final amount = double.tryParse(
+                                              goalAmountController.text);
+                                          final note = goalNoteController.text;
+
+                                          if (amount != null &&
+                                              note.isNotEmpty) {
+                                            // Call the addGoal method from GoalController
+                                            await _goalController.addGoalData(
+                                              userId: currentUserId,
+                                              amount: amount.toString(),
+                                              note:
+                                                  note, // You can modify this if you want the note to be different from the goal name
+                                            );
+
+                                            goalAmountController.clear();
+                                            goalNoteController.clear();
+                                            // Fetch the updated goals after adding the new goal
+                                            await _fetchGoal();
+                                            Navigator.pop(
+                                                context); // Close the dialog
+                                          } else {
+                                            Toast.showToast("Error Occoured");
+                                          }
+                                        },
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: primary),
                                         child: Text("Add",
@@ -239,12 +296,12 @@ class _GoalScreenState extends State<GoalScreen> {
                           radius: 120.0,
                           lineWidth: 13.0,
                           animation: true,
-                          percent: 0.5,
+                          percent: totalSaved / currentGoal!.goalAmount!,
                           center: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text("1000",
+                              Text("\$${(currentGoal!.goalAmount! - totalSaved).toStringAsFixed(2)}",
                                   style: TextStyle(
                                       fontFamily: "Poppins",
                                       color: secondary,
@@ -265,28 +322,45 @@ class _GoalScreenState extends State<GoalScreen> {
                           progressColor: primary,
                         ),
                         SizedBox(height: 20),
-                        ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: 4,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                elevation: 3,
-                                color: background,
-                                child: ListTile(
-                                  title: Text("Salary",
-                                      style: TextStyle(
-                                          fontFamily: "Poppins",
-                                          color: primary)),
-                                  trailing: Text("\$250",
-                                      style: TextStyle(
-                                          fontFamily: "Poppins",
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                          color: primary)),
-                                ),
-                              );
-                            }),
+                        StreamBuilder<List<GoalDataModel>>(
+                            stream: _goalController.getGoalDataStream(
+                                userId: currentUserId),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
+                              if (snapshot.hasError) {
+                                return Text("Error: ${snapshot.error}");
+                              }
+                              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return const Text("No goal amount added yet.");
+                              }
+
+                              final goalDataList = snapshot.data!;
+                              return ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: goalDataList.length,
+                                  itemBuilder: (context, index) {
+                                    final goalData = goalDataList[index];
+                                    return Card(
+                                      elevation: 3,
+                                      color: background,
+                                      child: ListTile(
+                                        title: Text(goalData.note!,
+                                            style: TextStyle(
+                                                fontFamily: "Poppins",
+                                                color: primary)),
+                                        trailing: Text("\$${goalData.amount}",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                color: primary)),
+                                      ),
+                                    );
+                                  });
+                            })
                       ],
                     ),
             ),

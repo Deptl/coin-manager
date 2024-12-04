@@ -4,6 +4,7 @@ import 'package:coin_manager/screens/home_screen.dart';
 import 'package:coin_manager/screens/signup_screen.dart';
 import 'package:coin_manager/utils/colors.dart';
 import 'package:coin_manager/utils/strings.dart';
+import 'package:coin_manager/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Image.asset("assets/images/login-image.png"),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height - 390,
+                  height: MediaQuery.of(context).size.height - 360,
                   width: double.infinity,
                   decoration: BoxDecoration(
                       color: background,
@@ -104,22 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: _emailTextEditingController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    final emailSnackbar1 = SnackBar(
-                                        content: Text("Please enter your email",
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                color: secondary)));
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(emailSnackbar1);
+                                    Toast.showToast("Enter email address");
                                   } else if (!_validateEmail(value)) {
-                                    final emailSnackbar1 = SnackBar(
-                                        content: Text(
-                                            "Please enter valid email",
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                color: secondary)));
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(emailSnackbar1);
+                                    Toast.showToast(
+                                        "Please enter valid email address");
                                   }
                                   return null;
                                 },
@@ -169,22 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 controller: _passwordTextEditingController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    final passSnackbar1 = SnackBar(
-                                        content: Text("Please enter password",
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                color: secondary)));
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(passSnackbar1);
-                                  } else if (value.length < 8) {
-                                    final passSnackbar2 = SnackBar(
-                                        content: Text(
-                                            "Please enter more than 8 characters",
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                color: secondary)));
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(passSnackbar2);
+                                    Toast.showToast("Please enter password");
                                   }
                                   return null;
                                 },
@@ -221,26 +195,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                                         HomeScreen(),
                                                   ),
                                                   (route) => false);
-                                            } else {
-                                              final loginSnackbar = SnackBar(
-                                                content: Text(
-                                                    "Invalid email or password",
-                                                    style: TextStyle(
-                                                        fontFamily: "Poppins",
-                                                        color: secondary)),
-                                              );
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(loginSnackbar);
                                             }
                                           } catch (e) {
-                                            final errorSnackbar = SnackBar(
-                                                content: Text(
-                                                    "Login failed: $e",
-                                                    style: TextStyle(
-                                                        fontFamily: "Poppins",
-                                                        color: secondary)));
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(errorSnackbar);
+                                            Toast.showToast(
+                                                "Invalid credentials");
                                           } finally {
                                             setState(() {
                                               isLoading = false;

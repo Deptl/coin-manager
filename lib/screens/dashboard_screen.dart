@@ -4,6 +4,7 @@ import 'package:coin_manager/utils/colors.dart';
 import 'package:coin_manager/utils/strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -96,16 +97,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   String formatDate(String isoString) {
-  // Parse the ISO string to a DateTime object
-  DateTime utcDateTime = DateTime.parse(isoString);
+    // Parse the ISO string to a DateTime object
+    DateTime utcDateTime = DateTime.parse(isoString);
 
-  // Convert to local time
-  DateTime localDateTime = utcDateTime.toLocal();
+    // Convert to local time
+    DateTime localDateTime = utcDateTime.toLocal();
 
-  // Format the DateTime to the desired format
-  return DateFormat('MMMM d, yyyy').format(localDateTime);
-}
-
+    // Format the DateTime to the desired format
+    return DateFormat('MMMM d, yyyy').format(localDateTime);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             Positioned(
                               top: 25,
-                              left: 335,
+                              left: 330,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: Container(
@@ -186,13 +186,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     padding: const EdgeInsets.only(top: 150),
                     child: StreamBuilder<Map<String, dynamic>>(
                       stream: getTransactionsStream(),
-                      builder: (context, snapshot){
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
                         }
 
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
                         }
 
                         if (!snapshot.hasData) {
@@ -205,119 +207,132 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         final expense = totals['expense'] ?? 0.0;
                         final balance = income - expense;
                         return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 170,
-                            width: 320,
-                            decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 47, 125, 121),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Total Balance",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              fontSize: 14,
-                                              color: background)),
-                                      Text("\$${balance.toStringAsFixed(2)}",
-                                          style: TextStyle(
-                                              fontFamily: "Poppins",
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 30,
-                                              color: background))
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(7),
-                                                child: Container(
-                                                    height: 20,
-                                                    width: 20,
-                                                    color: const Color.fromRGBO(
-                                                        250, 250, 250, 0.2),
-                                                    child: const Icon(
-                                                        FontAwesomeIcons
-                                                            .arrowDown,
-                                                        size: 10,
-                                                        color: background)),
-                                              ),
-                                              const SizedBox(width: 5),
-                                              const Text("Income",
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      fontSize: 15,
-                                                      color: background))
-                                            ],
-                                          ),
-                                          Text("\$${income.toStringAsFixed(2)}",
-                                              style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25,
-                                                  color: background))
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(7),
-                                                child: Container(
-                                                    height: 20,
-                                                    width: 20,
-                                                    color: const Color.fromRGBO(
-                                                        250, 250, 250, 0.2),
-                                                    child: const Icon(
-                                                        FontAwesomeIcons.arrowUp,
-                                                        size: 10,
-                                                        color: background)),
-                                              ),
-                                              const SizedBox(width: 5),
-                                              const Text("Expense",
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      fontSize: 15,
-                                                      color: background))
-                                            ],
-                                          ),
-                                          Text("\$${expense.toStringAsFixed(2)}",
-                                              style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25,
-                                                  color: background))
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 170,
+                              width: 320,
+                              decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(255, 47, 125, 121),
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Total Balance",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontSize: 14,
+                                                color: background)),
+                                        Text("\$${balance.toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 30,
+                                                color: background))
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(7),
+                                                  child: Container(
+                                                      height: 20,
+                                                      width: 20,
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              250,
+                                                              250,
+                                                              250,
+                                                              0.2),
+                                                      child: const Icon(
+                                                          FontAwesomeIcons
+                                                              .arrowDown,
+                                                          size: 10,
+                                                          color: background)),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                const Text("Income",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 15,
+                                                        color: background))
+                                              ],
+                                            ),
+                                            Text(
+                                                "\$${income.toStringAsFixed(2)}",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 25,
+                                                    color: background))
+                                          ],
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(7),
+                                                  child: Container(
+                                                      height: 20,
+                                                      width: 20,
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              250,
+                                                              250,
+                                                              250,
+                                                              0.2),
+                                                      child: const Icon(
+                                                          FontAwesomeIcons
+                                                              .arrowUp,
+                                                          size: 10,
+                                                          color: background)),
+                                                ),
+                                                const SizedBox(width: 5),
+                                                const Text("Expense",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 15,
+                                                        color: background))
+                                              ],
+                                            ),
+                                            Text(
+                                                "\$${expense.toStringAsFixed(2)}",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 25,
+                                                    color: background))
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      );
+                          ],
+                        );
                       },
                     ),
                   ),
@@ -400,8 +415,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       fontFamily: "Poppins",
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
-                                      color: transaction["type"] ==
-                                              "Income"
+                                      color: transaction["type"] == "Income"
                                           ? incomeColor
                                           : expenseColor)),
                             ),
